@@ -1,0 +1,8 @@
+.azuredevops
+aure-pipelines.yml
+.next
+.swc
+src/components/ui/
+**/*.md
+package-lock.json
+package.json

@@ -1,5 +1,5 @@
 "use client";
-
+import React from "react";
 import { Button } from "../ui/button";
 import {
   Dialog,
@@ -14,7 +14,13 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { counties } from "@/utils/counties";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 import { DatePicker } from "../ui/datePicker";
 import { useState } from "react";
 import { Alert, AlertDescription } from "../ui/alert";
@@ -40,14 +46,19 @@ const initialState: CreateEventDetails = {
 };
 
 export const CreateEventDialog = ({ onCreate }: CreateEventDialogProps) => {
-  const [eventDetails, setEventDetails] = useState<CreateEventDetails>(initialState);
+  const [eventDetails, setEventDetails] =
+    useState<CreateEventDetails>(initialState);
   const [error, setError] = useState<string | null>(null);
 
-  const handleEventTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleEventTitleChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     setEventDetails({ ...eventDetails, title: event.target.value });
   };
 
-  const handleDescriptionChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleDescriptionChange = (
+    event: React.ChangeEvent<HTMLTextAreaElement>,
+  ) => {
     setEventDetails({ ...eventDetails, description: event.target.value });
   };
 
@@ -59,7 +70,9 @@ export const CreateEventDialog = ({ onCreate }: CreateEventDialogProps) => {
     setEventDetails({ ...eventDetails, location: county });
   };
 
-  const handleMaxAttendeesChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleMaxAttendeesChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const maxAttendees = parseInt(event.target.value);
     if (event.target.value && isNaN(maxAttendees)) {
       dispatchTimedErrorMessage("Max attendees must be a number");
@@ -74,7 +87,9 @@ export const CreateEventDialog = ({ onCreate }: CreateEventDialogProps) => {
     if (!isDigit.test(eventDetails.maxAttendees.toString())) {
       return true;
     }
-    return Object.values(eventDetails).some((value) => value === undefined || value === "");
+    return Object.values(eventDetails).some(
+      (value) => value === undefined || value === "",
+    );
   };
 
   const dispatchTimedErrorMessage = (message: string) => {
@@ -101,7 +116,9 @@ export const CreateEventDialog = ({ onCreate }: CreateEventDialogProps) => {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create a new event</DialogTitle>
-          <DialogDescription>Create a new event to share with your friends.</DialogDescription>
+          <DialogDescription>
+            Create a new event to share with your friends.
+          </DialogDescription>
           {error != null && (
             <Alert variant="destructive">
               <AlertDescription>{error}</AlertDescription>

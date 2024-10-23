@@ -22,20 +22,19 @@ export function Navbar() {
       <div className="flex items-center space-x-4">
         {session ? (
           <>
-          <CreateEventDialog onCreate={(details) => console.log('Creating event', details)} />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">{session.user.name}</Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem>
-                <Link href="/my-events">My Events</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => signOut()}>
-                Log out
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+            <CreateEventDialog
+              onCreate={(details) => console.log("Creating event", details)}
+            />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline">{session.user.name}</Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onSelect={() => signOut()}>
+                  Log out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </>
         ) : (
           <Link href="/login">

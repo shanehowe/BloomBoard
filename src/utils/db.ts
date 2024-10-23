@@ -20,7 +20,7 @@ export async function connectToDatabase(): Promise<sql.ConnectionPool> {
       !config.password
     ) {
       throw new Error(
-        "Database configuration is incomplete. Check your environment variables."
+        "Database configuration is incomplete. Check your environment variables.",
       );
     }
     const pool = await new sql.ConnectionPool(config).connect();

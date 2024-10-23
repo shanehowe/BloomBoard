@@ -7,7 +7,7 @@ import { hashPassword } from "@/utils/auth";
 import sql from "mssql";
 
 async function registerUser(
-  credentials: Record<string, string>
+  credentials: Record<string, string>,
 ): Promise<User> {
   const { username, email, password } = credentials;
 
@@ -36,7 +36,7 @@ async function registerUser(
     .input("email", sql.NVarChar, email)
     .input("password", sql.NVarChar, hashedPassword)
     .query<User>(
-      "INSERT INTO Users (username, email, password) OUTPUT INSERTED.id, INSERTED.username, INSERTED.email VALUES (@username, @email, @password)"
+      "INSERT INTO Users (username, email, password) OUTPUT INSERTED.id, INSERTED.username, INSERTED.email VALUES (@username, @email, @password)",
     );
 
   const newUser = insertResult.recordset[0];
@@ -48,7 +48,7 @@ async function registerUser(
 }
 
 async function loginUser(
-  credentials: Record<string, string>
+  credentials: Record<string, string>,
 ): Promise<User | null> {
   const { username, password } = credentials;
 
@@ -56,9 +56,9 @@ async function loginUser(
   const userResult = await pool
     .request()
     .input("username", sql.NVarChar, username)
-    .query<User & { password: string }>(
-      "SELECT * FROM Users WHERE username = @username"
-    );
+    .query<
+      User & { password: string }
+    >("SELECT * FROM Users WHERE username = @username");
 
   const user = userResult.recordset[0];
 
