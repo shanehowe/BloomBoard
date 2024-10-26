@@ -9,10 +9,32 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CreateEventDialog } from "./create-event-dialog/createEventDialog";
+import {
+  CreateEventDetails,
+  CreateEventDialog,
+} from "./create-event-dialog/createEventDialog";
+import { useToast } from "@/hooks/use-toast";
+import { useCreateEvent } from "@/hooks/use-create-event";
 
 export function Navbar() {
   const { data: session } = useSession();
+  const { toast } = useToast();
+  const { error, createEvent } = useCreateEvent();
+
+  const handleCreate = async (eventDetails: CreateEventDetails) => {
+    const event = await createEvent(eventDetails);
+    if (error) {
+      toast({
+        title: "Error",
+        description: error,
+      });
+    } else {
+      toast({
+        title: "Event created",
+        description: `${event!.title} in ${event!.county} created successfully`,
+      });
+    }
+  };
 
   return (
     <nav className="flex justify-between items-center p-4 bg-white shadow-md">
@@ -22,9 +44,7 @@ export function Navbar() {
       <div className="flex items-center space-x-4">
         {session ? (
           <>
-            <CreateEventDialog
-              onCreate={(details) => console.log("Creating event", details)}
-            />
+            <CreateEventDialog onCreate={handleCreate} />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline">{session.user.name}</Button>

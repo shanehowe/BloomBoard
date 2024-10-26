@@ -1,8 +1,10 @@
 .azuredevops
-aure-pipelines.yml
 .next
 .swc
-src/components/ui/
-**/*.md
+azure-pipelines.yml
 package-lock.json
 package.json
+README.md
+tsconfig.json
+.eslintrc.json
+.gitignore

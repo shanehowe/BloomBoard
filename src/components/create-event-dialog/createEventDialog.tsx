@@ -23,32 +23,32 @@ import {
 } from "../ui/select";
 import { DatePicker } from "../ui/datePicker";
 import { useState } from "react";
-import { Alert, AlertDescription } from "../ui/alert";
 
 interface CreateEventDialogProps {
-  onCreate: (eventDetails: CreateEventDetails) => void;
+  onCreate: (eventDetails: CreateEventDetails) => Promise<void>;
 }
 
 export interface CreateEventDetails {
   title: string;
   description: string;
   date: Date | undefined;
-  location: string;
+  county: string;
   maxAttendees: number;
+  imageUrl?: string | null;
 }
 
 const initialState: CreateEventDetails = {
   title: "",
   description: "",
   date: undefined,
-  location: "",
+  county: "",
   maxAttendees: 0,
+  imageUrl: null,
 };
 
 export const CreateEventDialog = ({ onCreate }: CreateEventDialogProps) => {
   const [eventDetails, setEventDetails] =
     useState<CreateEventDetails>(initialState);
-  const [error, setError] = useState<string | null>(null);
 
   const handleEventTitleChange = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -67,18 +67,13 @@ export const CreateEventDialog = ({ onCreate }: CreateEventDialogProps) => {
   };
 
   const handleLocationChange = (county: string) => {
-    setEventDetails({ ...eventDetails, location: county });
+    setEventDetails({ ...eventDetails, county });
   };
 
   const handleMaxAttendeesChange = (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const maxAttendees = parseInt(event.target.value);
-    if (event.target.value && isNaN(maxAttendees)) {
-      dispatchTimedErrorMessage("Max attendees must be a number");
-      return;
-    }
-
     setEventDetails({ ...eventDetails, maxAttendees });
   };
 
@@ -92,21 +87,12 @@ export const CreateEventDialog = ({ onCreate }: CreateEventDialogProps) => {
     );
   };
 
-  const dispatchTimedErrorMessage = (message: string) => {
-    setError(message);
-    setTimeout(() => {
-      setError(null);
-    }, 3000);
-  };
-
-  const handleCreate = () => {
-    if (formHasEmptyFields()) {
-      dispatchTimedErrorMessage("Please fill out all fields");
-      return;
-    }
-    onCreate(eventDetails);
+  const handleCreate = async () => {
+    await onCreate(eventDetails);
     setEventDetails(initialState);
   };
+
+  const buttonIsDisabled = formHasEmptyFields();
 
   return (
     <Dialog>
@@ -119,11 +105,6 @@ export const CreateEventDialog = ({ onCreate }: CreateEventDialogProps) => {
           <DialogDescription>
             Create a new event to share with your friends.
           </DialogDescription>
-          {error != null && (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
@@ -159,7 +140,11 @@ export const CreateEventDialog = ({ onCreate }: CreateEventDialogProps) => {
               Location
             </Label>
             <Select onValueChange={handleLocationChange}>
-              <SelectTrigger className="col-span-3" id="event-location">
+              <SelectTrigger
+                className="col-span-3"
+                id="event-location"
+                data-testid="event-location"
+              >
                 <SelectValue placeholder="Counties" />
               </SelectTrigger>
               <SelectContent>
@@ -185,7 +170,11 @@ export const CreateEventDialog = ({ onCreate }: CreateEventDialogProps) => {
           </div>
         </div>
         <DialogFooter>
-          <Button type="submit" onClick={handleCreate}>
+          <Button
+            type="submit"
+            onClick={handleCreate}
+            disabled={buttonIsDisabled}
+          >
             Create
           </Button>
         </DialogFooter>

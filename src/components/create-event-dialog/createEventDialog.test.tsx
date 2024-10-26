@@ -19,7 +19,11 @@ jest.mock("../ui/datePicker", () => ({
   }) => (
     <input
       type="date"
-      value={date ? date.toISOString().split("T")[0] : ""}
+      value={
+        date
+          ? date.toISOString().split("T")[0]
+          : new Date().toISOString().split("T")[0]
+      }
       onChange={(e) => setDate(new Date(e.target.value))}
     />
   ),
@@ -27,7 +31,8 @@ jest.mock("../ui/datePicker", () => ({
 
 describe("CreateEventDialog", () => {
   it("renders", () => {
-    render(<CreateEventDialog onCreate={() => null} />);
+    const onCreate = jest.fn();
+    render(<CreateEventDialog onCreate={onCreate} />);
     fireEvent.click(screen.getByText("Create Event"));
     const heading = screen.getByText("Create a new event");
     expect(heading).toBeInTheDocument();
