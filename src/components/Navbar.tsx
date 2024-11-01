@@ -19,7 +19,7 @@ import { useCreateEvent } from "@/hooks/use-create-event";
 export function Navbar() {
   const { data: session } = useSession();
   const { toast } = useToast();
-  const { error, createEvent } = useCreateEvent();
+  const { error, createEvent, loading } = useCreateEvent();
 
   const handleCreate = async (eventDetails: CreateEventDetails) => {
     const event = await createEvent(eventDetails);
@@ -44,7 +44,7 @@ export function Navbar() {
       <div className="flex items-center space-x-4">
         {session ? (
           <>
-            <CreateEventDialog onCreate={handleCreate} />
+            <CreateEventDialog onCreate={handleCreate} loading={loading} />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline">{session.user.name}</Button>
