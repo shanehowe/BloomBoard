@@ -30,12 +30,12 @@ describe("GET /api/events", () => {
       },
     ];
 
-    (EventService.prototype.listEventsByCounty as jest.Mock).mockResolvedValue(
-      mockEvents,
-    );
+    (
+      EventService.prototype.findEventsNotCreatedByUserId as jest.Mock
+    ).mockResolvedValue(mockEvents);
 
     const results = await GET({
-      url: "http://localhost:3000/api/events?county=TestCounty",
+      url: "http://localhost:3000/api/events?userId=1",
     } as NextRequest);
     const jsonResults = await results.json();
 
@@ -44,12 +44,12 @@ describe("GET /api/events", () => {
   });
 
   it("should return 500 on service failure", async () => {
-    (EventService.prototype.listEventsByCounty as jest.Mock).mockRejectedValue(
-      new Error("Service error"),
-    );
+    (
+      EventService.prototype.findEventsNotCreatedByUserId as jest.Mock
+    ).mockRejectedValue(new Error("Service error"));
 
     const result = await GET({
-      url: "http://localhost:3000/api/events?county=TestCounty",
+      url: "http://localhost:3000/api/events?userId=1",
     } as NextRequest);
     const jsonResult = await result.json();
 
@@ -58,17 +58,17 @@ describe("GET /api/events", () => {
   });
 
   it("should call EventService.listByCounty with the correct county", async () => {
-    (EventService.prototype.listEventsByCounty as jest.Mock).mockResolvedValue(
-      [],
-    );
-    const county = "Kerry";
+    (
+      EventService.prototype.findEventsNotCreatedByUserId as jest.Mock
+    ).mockResolvedValue([]);
+    const userId = "1";
 
     await GET({
-      url: `http://localhost:3000/api/events?county=${county}`,
+      url: `http://localhost:3000/api/events?userId=${userId}`,
     } as NextRequest);
 
-    expect(EventService.prototype.listEventsByCounty).toHaveBeenCalledWith(
-      county,
-    );
+    expect(
+      EventService.prototype.findEventsNotCreatedByUserId,
+    ).toHaveBeenCalledWith(userId);
   });
 });

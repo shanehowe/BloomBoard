@@ -36,7 +36,9 @@ export const EventCard = ({ event, handleRegister }: EventCardProps) => {
           </div>
         )}
         <Badge className="mr-2 mt-2 py-1 px-3">County {event.county}</Badge>
-        <Badge className="mr-2 py-1 px-3">{event.date.toDateString()}</Badge>
+        <Badge className="mr-2 py-1 px-3">
+          {new Date(event.date).toDateString()}
+        </Badge>
         <Badge className="mr-2 py-1 px-3">{event.maxAttendees} attendees</Badge>
       </CardContent>
       <CardFooter>

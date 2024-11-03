@@ -31,6 +31,7 @@ const config: Config = {
       testMatch: [
         "<rootDir>/src/core/**/*.test.[jt]s?(x)",
         "<rootDir>/src/app/api/**/*.test.[jt]s?(x)",
+        "<rootDir>/src/app/api/events/[id]/route.test.[jt]s?(x)",
       ],
       testPathIgnorePatterns: ["/node_modules/", "/.next/"],
       moduleNameMapper: {

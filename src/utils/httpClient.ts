@@ -51,5 +51,5 @@ class HttpClient {
 }
 
 export const httpClient = new HttpClient(
-  process.env.NEXT_PUBLIC_BASE_URL as string ?? "http://localhost:3000/api",
+  (process.env.NEXT_PUBLIC_BASE_URL as string) ?? "http://localhost:3000/api",
 );

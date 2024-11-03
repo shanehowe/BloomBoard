@@ -4,13 +4,16 @@ import { EventDTO } from "../interfaces/IEvent";
 
 describe("Event Service", () => {
   const create = jest.fn();
+  const cancelAttendee = jest.fn();
   const eventService = new EventService({
     findAll: jest.fn().mockReturnValue([]),
     create,
+    cancelAttendee,
   });
 
   it("should retrieve all events", async () => {
-    const events = await eventService.listEventsByCounty("Test County");
+    const events =
+      await eventService.findEventsNotCreatedByUserId("Test County");
     expect(Array.isArray(events)).toBe(true);
   });
 
@@ -36,5 +39,10 @@ describe("Event Service", () => {
         county: "Test County",
       } as unknown as EventDTO),
     ).rejects.toThrow();
+  });
+
+  it("should cancel an attendee", async () => {
+    await eventService.cancelAttendee(1, 69);
+    expect(cancelAttendee).toHaveBeenCalled();
   });
 });

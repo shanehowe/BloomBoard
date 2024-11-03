@@ -32,7 +32,10 @@ describe("useCreateEvent", () => {
   });
 
   it("should set loading to true while creating event", async () => {
-    (httpClient.post as jest.Mock).mockResolvedValue({ status: 200, data: mockEvent });
+    (httpClient.post as jest.Mock).mockResolvedValue({
+      status: 200,
+      data: mockEvent,
+    });
 
     const { result } = renderHook(() => useCreateEvent());
 
@@ -46,7 +49,9 @@ describe("useCreateEvent", () => {
   });
 
   it("should set error if event creation fails", async () => {
-    (httpClient.post as jest.Mock).mockRejectedValue(new Error("Failed to create event"));
+    (httpClient.post as jest.Mock).mockRejectedValue(
+      new Error("Failed to create event"),
+    );
 
     const { result } = renderHook(() => useCreateEvent());
 
@@ -61,7 +66,10 @@ describe("useCreateEvent", () => {
   });
 
   it("should return event data if creation is successful", async () => {
-    (httpClient.post as jest.Mock).mockResolvedValue({ status: 200, data: mockEvent });
+    (httpClient.post as jest.Mock).mockResolvedValue({
+      status: 200,
+      data: mockEvent,
+    });
 
     const { result } = renderHook(() => useCreateEvent());
 
