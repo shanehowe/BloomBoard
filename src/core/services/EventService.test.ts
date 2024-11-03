@@ -5,10 +5,12 @@ import { EventDTO } from "../interfaces/IEvent";
 describe("Event Service", () => {
   const create = jest.fn();
   const cancelAttendee = jest.fn();
+  const findUserAttendingEvents = jest.fn().mockReturnValue([]);
   const eventService = new EventService({
     findAll: jest.fn().mockReturnValue([]),
     create,
     cancelAttendee,
+    findUserAttendingEvents,
   });
 
   it("should retrieve all events", async () => {
@@ -44,5 +46,11 @@ describe("Event Service", () => {
   it("should cancel an attendee", async () => {
     await eventService.cancelAttendee(1, 69);
     expect(cancelAttendee).toHaveBeenCalled();
+  });
+
+  it("should retrieve all events a user is attending", async () => {
+    const events = await eventService.findUserAttendingEvents(69);
+    expect(Array.isArray(events)).toBe(true);
+    expect(findUserAttendingEvents).toHaveBeenCalled();
   });
 });

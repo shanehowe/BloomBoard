@@ -12,6 +12,17 @@ export class EventRepo {
     return result.recordset as IEvent[];
   }
 
+  async findUserAttendingEvents(userId: number): Promise<IEvent[]> {
+    const pool = await connectToDatabase();
+    const result = await pool.request().input("userId", userId).query(`
+      SELECT e.* FROM Events e
+      JOIN Attendees a ON e.id = a.eventId
+      WHERE a.userId = @userId
+      AND e.date >= GETDATE()
+    `);
+    return result.recordset as IEvent[];
+  }
+
   async create(event: EventDTO): Promise<IEvent> {
     const pool = await connectToDatabase();
     const result = await pool

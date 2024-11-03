@@ -17,6 +17,10 @@ export class EventService {
     return await this.eventRepo.cancelAttendee(eventId, userId);
   }
 
+  async findUserAttendingEvents(userId: number) {
+    return await this.eventRepo.findUserAttendingEvents(userId);
+  }
+
   private validateEvent(event: EventDTO) {
     if (
       !event.title ||
