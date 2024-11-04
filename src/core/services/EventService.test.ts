@@ -1,21 +1,24 @@
-import "@testing-library/jest-dom";
 import { EventService } from "@/core/services/EventService";
+import "@testing-library/jest-dom";
 import { EventDTO } from "../interfaces/IEvent";
 
 describe("Event Service", () => {
   const create = jest.fn();
   const cancelAttendee = jest.fn();
+  const registerAttendee = jest.fn();
   const findUserAttendingEvents = jest.fn().mockReturnValue([]);
   const eventService = new EventService({
     findAll: jest.fn().mockReturnValue([]),
     create,
     cancelAttendee,
     findUserAttendingEvents,
+    registerAttendee,
   });
 
   it("should retrieve all events", async () => {
-    const events =
-      await eventService.findEventsNotCreatedByUserId("Test County");
+    const events = await eventService.findEventsNotCreatedByUserId(
+      "Test County"
+    );
     expect(Array.isArray(events)).toBe(true);
   });
 
@@ -39,13 +42,18 @@ describe("Event Service", () => {
         description: "Test Description",
         date: new Date(),
         county: "Test County",
-      } as unknown as EventDTO),
+      } as unknown as EventDTO)
     ).rejects.toThrow();
   });
 
   it("should cancel an attendee", async () => {
     await eventService.cancelAttendee(1, 69);
     expect(cancelAttendee).toHaveBeenCalled();
+  });
+
+  it("should register an attendee for the event", async () => {
+    await eventService.registerAttendee(1, 69);
+    expect(registerAttendee).toHaveBeenCalled();
   });
 
   it("should retrieve all events a user is attending", async () => {

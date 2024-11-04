@@ -40,6 +40,14 @@ export class EventRepo {
       `);
     return result.recordset[0] as IEvent;
   }
+  async registerAttendee(eventId: number, userId: number): Promise<void> {
+    const pool = await connectToDatabase();
+    await pool.request().input("eventId", eventId).input("userId", userId)
+      .query(`
+        INSERT INTO Attendees (eventId, userId)
+        VALUES (@eventId, @userId)
+      `);
+  }
 
   async cancelAttendee(eventId: number, userId: number): Promise<void> {
     const pool = await connectToDatabase();

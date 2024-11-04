@@ -1,20 +1,23 @@
-# Trigger on main branch for deployment only
 trigger:
   branches:
     include:
-      - main
+      - main  # Only trigger on main for deployments
 
 pr:
   branches:
     include:
-      - '*'
+      - '*'   # Include all branches for PR validation
+    exclude:
+      - main  # Exclude main so unit tests don't run on main as a PR
 
 pool:
   vmImage: ubuntu-latest
 
 jobs:
+  # Job for building and testing, runs on all PRs except main
   - job: Build_and_Test
     displayName: "Build and Test"
+    condition: ne(variables['Build.SourceBranch'], 'refs/heads/main')  # Exclude main branch
     steps:
       - task: Bash@3
         displayName: "Create .env.local file"
@@ -38,11 +41,10 @@ jobs:
           npm run test
         displayName: "Run unit tests"
 
-  # Job for deploying to Vercel, runs only after a successful merge to main
+  # Job for deploying to Vercel, only runs after a successful merge into main
   - job: Deploy_to_Vercel
     displayName: "Deploy to Vercel"
-    dependsOn: Build_and_Test
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
     steps:
       - task: vercel-deployment-task@1
         inputs:
