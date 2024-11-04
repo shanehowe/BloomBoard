@@ -8,6 +8,7 @@ export class EventRepo {
       SELECT * FROM Events
       WHERE date >= GETDATE()
       and userId != @userId
+      ORDER BY date
     `);
     return result.recordset as IEvent[];
   }

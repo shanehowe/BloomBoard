@@ -35,11 +35,22 @@ jobs:
           npm install
           npm run build
         displayName: "npm install and build"
-
-      # Run unit tests using Jest
-      - script: |
-          npm run test
-        displayName: "Run unit tests"
+      - task: Npm@1
+        displayName: npm run test
+        inputs:
+          command: 'custom'
+          workingDir: '.'
+          customCommand: 'run test:ci'
+      - task: PublishTestResults@2
+        displayName: 'supply npm test results to pipelines'
+        condition: succeededOrFailed() # because otherwise we won't know what tests failed
+        inputs:
+          testResultsFiles: './junit.xml'
+      
+      - task: PublishCodeCoverageResults@2
+        displayName: 'supply code coverage to pipelines'
+        inputs:
+          summaryFileLocation: './coverage/clover.xml'
 
   # Job for deploying to Vercel, only runs after a successful merge into main
   - job: Deploy_to_Vercel

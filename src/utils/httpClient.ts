@@ -25,8 +25,12 @@ class HttpClient {
     };
   }
 
-  async post<T, K>(url: string, body: K): Promise<ApiResponse<T>> {
-    const response = await this.axiosInstance.post<T>(url, body);
+  async post<T, K>(
+    url: string,
+    body: K,
+    headers?: object,
+  ): Promise<ApiResponse<T>> {
+    const response = await this.axiosInstance.post<T>(url, body, { headers });
     return {
       status: response.status,
       data: response.data,

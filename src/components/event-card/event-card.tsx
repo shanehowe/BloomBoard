@@ -11,6 +11,7 @@ import {
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import Image from "next/image";
+import { Check } from "lucide-react";
 
 interface EventCardProps {
   event: IEvent;
@@ -42,7 +43,10 @@ export const EventCard = ({ event, handleRegister }: EventCardProps) => {
         <Badge className="mr-2 py-1 px-3">{event.maxAttendees} attendees</Badge>
       </CardContent>
       <CardFooter>
-        <Button onClick={() => handleRegister(event.id)}>Register</Button>
+        <Button className="w-full" onClick={() => handleRegister(event.id)}>
+          <Check size={16} className="mr-2" />
+          Register
+        </Button>
       </CardFooter>
     </Card>
   );

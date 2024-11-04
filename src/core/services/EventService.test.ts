@@ -16,9 +16,8 @@ describe("Event Service", () => {
   });
 
   it("should retrieve all events", async () => {
-    const events = await eventService.findEventsNotCreatedByUserId(
-      "Test County"
-    );
+    const events =
+      await eventService.findEventsNotCreatedByUserId("Test County");
     expect(Array.isArray(events)).toBe(true);
   });
 
@@ -42,7 +41,7 @@ describe("Event Service", () => {
         description: "Test Description",
         date: new Date(),
         county: "Test County",
-      } as unknown as EventDTO)
+      } as unknown as EventDTO),
     ).rejects.toThrow();
   });
 

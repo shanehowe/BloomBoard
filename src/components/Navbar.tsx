@@ -21,8 +21,11 @@ export function Navbar() {
   const { toast } = useToast();
   const { error, createEvent, loading } = useCreateEvent();
 
-  const handleCreate = async (eventDetails: CreateEventDetails) => {
-    const event = await createEvent(eventDetails);
+  const handleCreate = async (
+    eventDetails: CreateEventDetails,
+    image: File | null,
+  ) => {
+    const event = await createEvent(eventDetails, image);
     if (error) {
       toast({
         title: "Error",

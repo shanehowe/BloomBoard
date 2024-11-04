@@ -20,6 +20,7 @@ export class EventService {
   async findUserAttendingEvents(userId: number) {
     return await this.eventRepo.findUserAttendingEvents(userId);
   }
+
   async registerAttendee(eventId: number, userId: number) {
     return await this.eventRepo.registerAttendee(eventId, userId);
   }

@@ -41,11 +41,11 @@ describe("Home Page", () => {
     expect(screen.getByText("Welcome to BloomBoard")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /get started/i })).toHaveAttribute(
       "href",
-      "/register"
+      "/register",
     );
     expect(screen.getByRole("link", { name: /sign in/i })).toHaveAttribute(
       "href",
-      "/login"
+      "/login",
     );
   });
 
@@ -56,7 +56,7 @@ describe("Home Page", () => {
 
   it("handles database connection error gracefully", async () => {
     (connectToDatabase as jest.Mock).mockRejectedValueOnce(
-      new Error("Connection failed")
+      new Error("Connection failed"),
     );
     const page = await Home();
     render(page);

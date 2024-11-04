@@ -26,7 +26,11 @@ import { useState } from "react";
 import { LoadingSpinner } from "../ui/loading-spinner";
 
 interface CreateEventDialogProps {
-  onCreate: (eventDetails: CreateEventDetails) => Promise<void>;
+  onCreate: (
+    eventDetails: CreateEventDetails,
+    image: File | null,
+  ) => Promise<void>;
+  message?: string | null;
   loading?: boolean;
 }
 
@@ -51,9 +55,11 @@ const initialState: CreateEventDetails = {
 export const CreateEventDialog = ({
   onCreate,
   loading,
+  message,
 }: CreateEventDialogProps) => {
   const [eventDetails, setEventDetails] =
     useState<CreateEventDetails>(initialState);
+  const [image, setImage] = useState<File | null>(null);
 
   const handleEventTitleChange = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -82,6 +88,13 @@ export const CreateEventDialog = ({
     setEventDetails({ ...eventDetails, maxAttendees });
   };
 
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setImage(file);
+    }
+  };
+
   const formHasEmptyFields = () => {
     const isDigit = /^\d+$/;
     if (!isDigit.test(eventDetails.maxAttendees.toString())) {
@@ -93,7 +106,7 @@ export const CreateEventDialog = ({
   };
 
   const handleCreate = async () => {
-    await onCreate(eventDetails);
+    await onCreate(eventDetails, image);
     setEventDetails(initialState);
   };
 
@@ -112,7 +125,7 @@ export const CreateEventDialog = ({
           </DialogDescription>
         </DialogHeader>
         {loading ? (
-          <CreateEventLoadingSpinner />
+          <CreateEventLoadingSpinner message={message} />
         ) : (
           <>
             <div className="grid gap-4 py-4">
@@ -180,6 +193,18 @@ export const CreateEventDialog = ({
                   value={eventDetails.maxAttendees}
                 />
               </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label className="text-right" htmlFor="event-image">
+                  Image (optional)
+                </Label>
+                <Input
+                  id="event-image"
+                  className="col-span-3"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                />
+              </div>
             </div>
             <DialogFooter>
               <Button
@@ -197,11 +222,18 @@ export const CreateEventDialog = ({
   );
 };
 
-const CreateEventLoadingSpinner = (): React.ReactNode => {
+interface CreateEventLoadingSpinnerProps {
+  message: string | null | undefined;
+}
+
+const CreateEventLoadingSpinner = ({
+  message,
+}: CreateEventLoadingSpinnerProps): React.ReactNode => {
+  const messageToShow = message ?? "Creating event...";
   return (
     <div className="flex flex-col justify-center items-center h-64">
       <div className="text-center">
-        <p>Creating event...</p>
+        <p>{messageToShow}</p>
         <p className="text-sm text-gray-500">This may take a few seconds</p>
       </div>
       <LoadingSpinner size={35} className="mt-5" />
