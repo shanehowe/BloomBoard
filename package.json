@@ -14,7 +14,7 @@
     "lint": "next lint && npx prettier --check .",
     "test": "jest",
     "prettier": "npx prettier --write .",
-    "test:ci": "npm run test -- --watchAll=false --reporters=default --reporters=jest-junit --silent --coverage"
+    "test:ci": "npm run test -- --watchAll=false --reporters=default --reporters=jest-junit --silent"
   },
   "dependencies": {
     "@azure/identity": "^4.5.0",

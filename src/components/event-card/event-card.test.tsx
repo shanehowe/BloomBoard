@@ -18,7 +18,7 @@ describe("EventCard", () => {
   const handleRegister = jest.fn();
 
   it("renders correctly", () => {
-    render(<EventCard event={mockEvent} handleRegister={handleRegister} />);
+    render(<EventCard event={mockEvent} handleButtonClick={handleRegister} />);
     expect(screen.getByText("Sample Event")).toBeInTheDocument();
     expect(screen.getByText("This is a sample event.")).toBeInTheDocument();
     expect(screen.getByText("County Sample County")).toBeInTheDocument();
@@ -27,7 +27,7 @@ describe("EventCard", () => {
   });
 
   it("calls handleRegister when the Register button is clicked", () => {
-    render(<EventCard event={mockEvent} handleRegister={handleRegister} />);
+    render(<EventCard event={mockEvent} handleButtonClick={handleRegister} />);
     fireEvent.click(screen.getByText("Register"));
     expect(handleRegister).toHaveBeenCalledWith(1);
   });

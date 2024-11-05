@@ -15,10 +15,19 @@ import { Check } from "lucide-react";
 
 interface EventCardProps {
   event: IEvent;
-  handleRegister: (eventId: number) => void;
+  handleButtonClick: (eventId: number) => void | Promise<void>;
+  loading?: boolean;
 }
 
-export const EventCard = ({ event, handleRegister }: EventCardProps) => {
+export const EventCard = ({ event, handleButtonClick }: EventCardProps) => {
+  const [loading, setLoading] = React.useState(false);
+
+  const handleRegister = async (eventId: number) => {
+    setLoading(true);
+    await handleButtonClick(eventId);
+    setLoading(false);
+  };
+
   return (
     <Card className="w-1/2">
       <CardHeader>
@@ -43,9 +52,13 @@ export const EventCard = ({ event, handleRegister }: EventCardProps) => {
         <Badge className="mr-2 py-1 px-3">{event.maxAttendees} attendees</Badge>
       </CardContent>
       <CardFooter>
-        <Button className="w-full" onClick={() => handleRegister(event.id)}>
+        <Button
+          className="w-full"
+          onClick={() => handleRegister(event.id)}
+          disabled={loading}
+        >
           <Check size={16} className="mr-2" />
-          Register
+          {loading ? "Registering..." : "Register"}
         </Button>
       </CardFooter>
     </Card>

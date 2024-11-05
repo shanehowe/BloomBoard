@@ -4,13 +4,13 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { EventList } from "@/components/event-list/event-list";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useEventFeed } from "@/hooks/use-event-feed";
+import { useEventFeed } from "@/components/EventsProvider";
 
 export default function EventFeedPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  const { events, isLoading } = useEventFeed(session?.user.id);
+  const { events, isLoading } = useEventFeed();
 
   if (status === "loading") {
     return (

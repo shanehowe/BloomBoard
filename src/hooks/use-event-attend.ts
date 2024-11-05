@@ -1,29 +1,29 @@
+import { useEventFeed } from "@/components/EventsProvider";
 import { httpClient } from "@/utils/httpClient";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 interface UseAttendEventReturn {
-  registerForEvent: () => Promise<void>;
-  cancelAttendance: () => Promise<void>;
+  registerForEvent: (eventId: number) => Promise<void>;
+  cancelAttendance: (eventId: number) => Promise<void>;
   loading: boolean;
   error: string | null;
 }
 
-export function useAttendEvent(eventId: number): UseAttendEventReturn {
+export function useAttendEvent(): UseAttendEventReturn {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
+  const { filterEvents } = useEventFeed();
 
-  const registerForEvent = async () => {
+  const registerForEvent = async (eventId: number) => {
     setLoading(true);
     setError(null);
     try {
       const response = await httpClient.post<{ message: string }, undefined>(
-        `/api/events/${eventId}/attend`,
-        undefined
+        `/events/${eventId}/attend`,
+        undefined,
       );
       if (response.status === 200) {
-        router.refresh();
+        filterEvents(eventId);
       } else {
         setError("Failed to register for event");
       }
@@ -35,15 +35,15 @@ export function useAttendEvent(eventId: number): UseAttendEventReturn {
     }
   };
 
-  const cancelAttendance = async () => {
+  const cancelAttendance = async (eventId: number) => {
     setLoading(true);
     setError(null);
     try {
       const response = await httpClient.delete<{ message: string }>(
-        `/api/events/${eventId}/attend`
+        `/events/${eventId}/attend`,
       );
       if (response.status === 200) {
-        router.refresh();
+        filterEvents(eventId);
       } else {
         setError("Failed to cancel attendance");
       }

@@ -8,7 +8,11 @@ export class EventRepo {
       SELECT * FROM Events
       WHERE date >= GETDATE()
       and userId != @userId
-      ORDER BY date
+      and Events.id not in (
+        SELECT eventId FROM Attendees
+        WHERE Attendees.userId = @userId
+      )
+      ORDER BY date;
     `);
     return result.recordset as IEvent[];
   }
