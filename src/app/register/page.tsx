@@ -1,8 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -14,42 +17,54 @@ import {
 } from "@/components/ui/card";
 import Link from "next/link";
 
+const registerSchema = z.object({
+  username: z
+    .string()
+    .min(3, "Username must be at least 3 characters")
+    .max(20, "Username must be less than 20 characters"),
+  email: z.string().email("Please enter a valid email"),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .regex(/[0-9]/, "Password must contain at least one number"),
+});
+
+type RegisterForm = z.infer<typeof registerSchema>;
+
 export default function RegisterPage() {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [serverError, setServerError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterForm>({
+    resolver: zodResolver(registerSchema),
+  });
 
-    if (!username || !email || !password) {
-      setError("Please fill all fields");
-      return;
-    }
-
+  const onSubmit = async (data: RegisterForm) => {
     try {
       setIsLoading(true);
+      setServerError("");
+
       const result = await signIn("credentials", {
-        username,
-        email,
-        password,
+        ...data,
         action: "register",
         redirect: false,
       });
 
       if (result?.error) {
-        setError(result.error);
+        setServerError(result.error);
       } else if (result?.ok) {
         router.push("/feed");
         router.refresh();
       }
     } catch (error) {
       console.error("Registration error:", error);
-      setError("An error occurred during registration");
+      setServerError("An error occurred during registration");
     } finally {
       setIsLoading(false);
     }
@@ -61,41 +76,49 @@ export default function RegisterPage() {
         <CardHeader>
           <CardTitle>Register</CardTitle>
         </CardHeader>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <CardContent>
             <div className="grid w-full items-center gap-4">
-              {error && <p className="text-red-500 text-sm">{error}</p>}
+              {serverError && (
+                <p className="text-red-500 text-sm">{serverError}</p>
+              )}
               <div className="flex flex-col space-y-1.5">
                 <Input
-                  id="username"
+                  {...register("username")}
                   placeholder="Username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
                   disabled={isLoading}
-                  required
                 />
+                {errors.username && (
+                  <span className="text-red-500 text-sm">
+                    {errors.username.message}
+                  </span>
+                )}
               </div>
               <div className="flex flex-col space-y-1.5">
                 <Input
-                  id="email"
+                  {...register("email")}
                   type="email"
                   placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
                   disabled={isLoading}
-                  required
                 />
+                {errors.email && (
+                  <span className="text-red-500 text-sm">
+                    {errors.email.message}
+                  </span>
+                )}
               </div>
               <div className="flex flex-col space-y-1.5">
                 <Input
-                  id="password"
+                  {...register("password")}
                   type="password"
                   placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
                   disabled={isLoading}
-                  required
                 />
+                {errors.password && (
+                  <span className="text-red-500 text-sm">
+                    {errors.password.message}
+                  </span>
+                )}
               </div>
             </div>
           </CardContent>

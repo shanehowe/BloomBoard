@@ -14,7 +14,13 @@ jest.mock("@/utils/db", () => ({
 jest.mock("next/image", () => ({
   __esModule: true,
   default: ({ src, alt }: { src: string; alt: string }) => (
-    <img src={src} alt={alt} data-testid="next-image" />
+    <div
+      data-testid="next-image"
+      data-src={src}
+      data-alt={alt}
+      role="img"
+      aria-label={alt}
+    />
   ),
 }));
 
@@ -41,11 +47,11 @@ describe("Home Page", () => {
     expect(screen.getByText("Welcome to BloomBoard")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /get started/i })).toHaveAttribute(
       "href",
-      "/register",
+      "/register"
     );
     expect(screen.getByRole("link", { name: /sign in/i })).toHaveAttribute(
       "href",
-      "/login",
+      "/login"
     );
   });
 
@@ -56,10 +62,20 @@ describe("Home Page", () => {
 
   it("handles database connection error gracefully", async () => {
     (connectToDatabase as jest.Mock).mockRejectedValueOnce(
-      new Error("Connection failed"),
+      new Error("Connection failed")
     );
     const page = await Home();
     render(page);
     expect(screen.getByText("Welcome to BloomBoard")).toBeInTheDocument();
+  });
+
+  // Added new test to verify image rendering
+  it("renders the welcome image correctly", async () => {
+    const page = await Home();
+    render(page);
+
+    const image = screen.getByTestId("next-image");
+    expect(image).toHaveAttribute("data-src", "/images/welcome-image.jpg");
+    expect(image).toHaveAttribute("data-alt", "BloomBoard Dashboard Preview");
   });
 });

@@ -47,6 +47,9 @@ export function Navbar() {
       <div className="flex items-center space-x-4">
         {session ? (
           <>
+            <Link href={'/feed'}>
+              Feed
+            </Link>
             <CreateEventDialog onCreate={handleCreate} loading={loading} />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import type { User } from "next-auth";
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
@@ -5,9 +6,10 @@ import bcrypt from "bcryptjs";
 import { connectToDatabase } from "@/utils/db";
 import { hashPassword } from "@/utils/auth";
 import sql from "mssql";
+import { RequestInternal } from "next-auth";
 
-async function registerUser(
-  credentials: Record<string, string>,
+export async function registerUser(
+  credentials: Record<string, string>
 ): Promise<User> {
   const { username, email, password } = credentials;
 
@@ -17,7 +19,6 @@ async function registerUser(
 
   const pool = await connectToDatabase();
 
-  // Check if user already exists
   const existingUser = await pool
     .request()
     .input("username", sql.NVarChar, username)
@@ -28,7 +29,6 @@ async function registerUser(
     throw new Error("Username or email already exists");
   }
 
-  // Create new user
   const hashedPassword = await hashPassword(password);
   const insertResult = await pool
     .request()
@@ -36,7 +36,7 @@ async function registerUser(
     .input("email", sql.NVarChar, email)
     .input("password", sql.NVarChar, hashedPassword)
     .query<User>(
-      "INSERT INTO Users (username, email, password) OUTPUT INSERTED.id, INSERTED.username, INSERTED.email VALUES (@username, @email, @password)",
+      "INSERT INTO Users (username, email, password) OUTPUT INSERTED.id, INSERTED.username, INSERTED.email VALUES (@username, @email, @password)"
     );
 
   const newUser = insertResult.recordset[0];
@@ -47,8 +47,8 @@ async function registerUser(
   };
 }
 
-async function loginUser(
-  credentials: Record<string, string>,
+export async function loginUser(
+  credentials: Record<string, string>
 ): Promise<User | null> {
   const { username, password } = credentials;
 
@@ -56,9 +56,9 @@ async function loginUser(
   const userResult = await pool
     .request()
     .input("username", sql.NVarChar, username)
-    .query<
-      User & { password: string }
-    >("SELECT * FROM Users WHERE username = @username");
+    .query<User & { password: string }>(
+      "SELECT * FROM Users WHERE username = @username"
+    );
 
   const user = userResult.recordset[0];
 
@@ -67,6 +67,39 @@ async function loginUser(
   }
 
   return null;
+}
+
+type AuthorizeCredentials = Record<
+  "username" | "email" | "password" | "action",
+  string
+>;
+
+export async function authorize(
+  credentials: AuthorizeCredentials | undefined,
+  _req: Pick<RequestInternal, "body" | "query" | "headers" | "method">
+): Promise<User | null> {
+  if (
+    !credentials?.username ||
+    !credentials?.password ||
+    !credentials?.action
+  ) {
+    throw new Error("Missing required fields");
+  }
+
+  if (credentials.action === "register") {
+    return registerUser(credentials).catch((error) => {
+      console.error("Registration error:", error);
+      throw error;
+    });
+  }
+
+  if (credentials.action === "login") {
+    const user = await loginUser(credentials);
+    if (!user) throw new Error("Invalid username or password");
+    return user;
+  }
+
+  throw new Error("Invalid action");
 }
 
 export const authOptions: NextAuthOptions = {
@@ -79,26 +112,7 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
         action: { label: "Action", type: "text" },
       },
-      async authorize(credentials): Promise<User | null> {
-        if (
-          !credentials?.username ||
-          !credentials?.password ||
-          !credentials?.action
-        ) {
-          throw new Error("Missing required fields");
-        }
-
-        try {
-          if (credentials.action === "register") {
-            return await registerUser(credentials);
-          } else {
-            return await loginUser(credentials);
-          }
-        } catch (error) {
-          console.error("Authorization error:", error);
-          throw error;
-        }
-      },
+      authorize,
     }),
   ],
   callbacks: {
